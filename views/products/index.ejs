@@ -1,5 +1,17 @@
 <% layout("layouts/boilerplate") -%>
 
+<!--Flash messages-->
+<% if(error && error.length > 0){ %>
+<div id="flash" class="alert alert-danger" role="alert">
+    <%= error %>
+</div>
+<% } %>
+<% if(success && success.length > 0){ %>
+<div id="flash" class="alert alert-success" role="alert">
+    <%= success %>
+</div>
+<% } %>
+
 <% products.forEach(function(productChunk) { %>
 <div class="row">
     <% productChunk.forEach(function(product) { %>

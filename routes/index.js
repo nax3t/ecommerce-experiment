@@ -1,5 +1,7 @@
 var express = require("express");
 var router = express.Router();
+var keyPublishable = process.env.PUBLISHABLE_KEY;
+var stripe = require("stripe")(process.env.SECRET_KEY);
 
 var Cart = require("../models/cart");
 var Product = require("../models/product");
@@ -41,6 +43,39 @@ router.get("/shopping-cart", function (req, res) {
     // else pass the existing cart
     var cart = new Cart(req.session.cart);
     res.render("products/shopping-cart", {products: cart.generateArray(), totalPrice: cart.totalPrice});
+});
+
+// get the cart checkout route
+router.get("/checkout", function (req, res, next) {
+    if  (!req.session.cart) {
+        return res.redirect("/shopping-cart");
+    }
+    var cart = new Cart(req.session.cart);
+    res.render("products/checkout", {keyPublishable: keyPublishable, total: cart.totalPrice});
+});
+
+// post route checkout
+router.post("/checkout", function (req, res) {
+    if  (!req.session.cart) {
+        return res.redirect("/shopping-cart");
+    }
+    var cart = new Cart(req.session.cart);
+    stripe.charges.create({
+        amount: cart.totalPrice * 100,           // set amount to cart's total price
+        currency: "usd",
+        source: req.body.stripeToken, // obtained with Stripe.js
+        description: "Test Tour Charge"
+    }, function(err, charge) {
+        // if something went wrong with the purchase
+        if (err) {
+            req.flash("error", err.message);
+            return res.redirect("/checkout");
+        }
+        // if the purchase is successful
+        req.flash("success", "You successfully paid $" + cart.totalPrice + "!");
+        req.session.cart = null;
+        res.redirect("/products");
+    });
 });
 
 module.exports = router;

@@ -54,19 +54,14 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // passing publishable key to every template
-app.use(function(req, res, next) {
-  app.locals.keyPublishable = keyPublishable;
-  next();
-});
-
 // passing currentUser to every template
-app.use(function (req, res, next) {
-    res.locals.currentUser = req.user;
-    next();
-});
-
+// passing session to every template
 app.use(function(req, res, next) {
+    app.locals.keyPublishable = keyPublishable;
+    res.locals.currentUser = req.user;
     res.locals.session = req.session;
+    res.locals.error = req.flash("error");
+    res.locals.success = req.flash("success");
     next();
 });
 
