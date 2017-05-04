@@ -13,6 +13,7 @@ const session = require("express-session");
 const passport = require("passport");
 const flash = require("connect-flash");
 const validator = require("express-validator");
+const MongoStore = require("connect-mongo")(session);
 
 const productRoutes = require("./routes/products");
 const indexRoutes = require("./routes/index");
@@ -38,9 +39,17 @@ app.use(express.static("public"));
 app.use(methodOverride('_method'));
 app.use(cookieParser());
 
-// session and passport setup
-app.use(session({secret: "SuperSecretStuff", resave: false, saveUninitialized: false}));
+// session setup
+app.use(session({
+    secret: "SuperSecretStuff",
+    resave: false,
+    saveUninitialized: false,
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
+    cookie: { maxAge: 180 * 60 * 1000 }    // 180 minutes session expiration
+}));
 app.use(flash());
+
+// passport setup
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -53,6 +62,7 @@ app.use(function(req, res, next) {
 // passing currentUser to every template
 app.use(function (req, res, next) {
     res.locals.currentUser = req.user;
+    res.locals.session = req.session;
     next();
 });
 
