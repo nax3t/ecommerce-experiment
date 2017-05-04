@@ -62,6 +62,10 @@ app.use(function(req, res, next) {
 // passing currentUser to every template
 app.use(function (req, res, next) {
     res.locals.currentUser = req.user;
+    next();
+});
+
+app.use(function(req, res, next) {
     res.locals.session = req.session;
     next();
 });

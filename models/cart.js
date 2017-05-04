@@ -1,4 +1,4 @@
-// Cart constructor
+// Cart Constructor
 // gets the old cart when adding (first time the oldCart is an empty object)
 // assign values of the old cart
 // add a new item (check if it exists), increase quantity, price, totalQty, totalPrice
@@ -23,14 +23,14 @@ module.exports = function Cart(oldCart) {       // add old cart into new cart
         storedItem.price = storedItem.item.basePrice * storedItem.qty;
         this.totalQty++;
         this.totalPrice += storedItem.item.basePrice;
-
-        // transform it into an array for lists etc.
-        this.generateArray = function () {
-            var arr = [];
-            for (var id in this.items) {
-                arr.push(this.items[id]);
-            }
-            return arr;
         };
-    }
+
+    // transform it into an array for lists etc.
+    this.generateArray = function () {
+        var arr = [];
+        for (var id in this.items) {
+            arr.push(this.items[id]);
+        }
+        return arr;
+    };
 };

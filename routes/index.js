@@ -32,4 +32,15 @@ router.get("/add-to-cart/:id", function (req, res) {
     });
 });
 
+// get the shopping cart view
+router.get("/shopping-cart", function (req, res) {
+    // if the cart in the session is empty, pass products to view as null
+    if  (!req.session.cart) {
+        return res.render("products/shopping-cart", {products: null, totalPrice: null});
+    }
+    // else pass the existing cart
+    var cart = new Cart(req.session.cart);
+    res.render("products/shopping-cart", {products: cart.generateArray(), totalPrice: cart.totalPrice});
+});
+
 module.exports = router;
