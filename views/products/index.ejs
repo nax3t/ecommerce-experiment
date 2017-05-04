@@ -1,0 +1,23 @@
+<% layout('layouts/boilerplate') -%>
+
+<% products.forEach(function(productChunk) { %>
+<div class="row">
+    <% productChunk.forEach(function(product) { %>
+    <div class="col-sm-6 col-md-3">
+        <div class="thumbnail">
+            <a href="/products/<%= product.id %>">
+                <img class="img-responsive" src="<%= product.imagePath %>" alt="Alcatraz"></a>
+            <div class="caption">
+                <h4>Tour of Alcatraz</h4>
+                <p class="description"><%= product.formattedDate %></p>
+                <div class="clearfix">
+                    <div class="price pull-left">from $<%= product.basePrice %></div>
+                    <a href="#" class="btn btn-success pull-right" role="button"><i class="fa fa-cart-plus"
+                                                                                    aria-hidden="true"></i> Add to Cart</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <% }); %>
+</div>
+<% }); %>

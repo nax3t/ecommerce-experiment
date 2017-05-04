@@ -1,0 +1,19 @@
+.thumbnail img {
+    width: auto;
+    min-height: 15em;
+    overflow: hidden;
+    object-fit: cover;
+}
+
+.thumbnail .description {
+    color: #848484;
+}
+
+.price {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.thumbnail {
+    min-height: 300px;
+}
