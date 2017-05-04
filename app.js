@@ -16,6 +16,7 @@ const validator = require("express-validator");
 
 const productRoutes = require("./routes/products");
 const indexRoutes = require("./routes/index");
+const userRoutes = require("./routes/user");
 
 
 
@@ -43,12 +44,21 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 
+// passing publishable key to every template
 app.use(function(req, res, next) {
   app.locals.keyPublishable = keyPublishable;
   next();
 });
 
+// passing currentUser to every template
+app.use(function (req, res, next) {
+    res.locals.currentUser = req.user;
+    next();
+});
+
+// use routes
 app.use(indexRoutes);
+app.use("/user", userRoutes);
 app.use("/products", productRoutes);
 
 app.listen(3000, () => {
