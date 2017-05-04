@@ -12,6 +12,7 @@ const methodOverride = require("method-override");
 const session = require("express-session");
 const passport = require("passport");
 const flash = require("connect-flash");
+const validator = require("express-validator");
 
 const productRoutes = require("./routes/products");
 const indexRoutes = require("./routes/index");
@@ -24,7 +25,9 @@ require("./config/passport");
 // mongoose.connect("mongodb://localhost/node-ecommerce-test");
 
 // parse application/x-www-form-urlencoded
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(validator());
 
 // use ejs-locals for all ejs templates: 
 app.engine('ejs', engine);

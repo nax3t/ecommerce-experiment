@@ -5,7 +5,9 @@
         <h1>Register</h1>
         <% if (messages.length > 0) { %>
                 <div class="alert alert-danger">
-                    <%= messages %>
+                    <% messages.forEach(function (message) { %>
+                        <%= message %> <br>
+                    <% }); %>
                 </div>
         <% } %>
         <form action="/user/register" method="POST">
