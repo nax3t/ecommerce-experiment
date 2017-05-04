@@ -1,1 +1,27 @@
 <% layout("layouts/boilerplate") -%>
+
+<div class="row">
+    <div class="col-md-4 col-md-offset-4">
+        <h1>Login</h1>
+        <% if (messages.length > 0) { %>
+        <div class="alert alert-danger">
+            <% messages.forEach(function (message) { %>
+            <%= message %> <br>
+            <% }); %>
+        </div>
+        <% } %>
+        <form action="/user/login" method="POST">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input class="form-control" type="text" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input class="form-control" type="password" id="password" name="password" required>
+            </div>
+            <input type="hidden" name="_csrf" value=<%= csrfToken %>>
+            <button type="submit" class="btn btn-primary">Sign In</button>
+        </form>
+
+    </div>
+</div>
