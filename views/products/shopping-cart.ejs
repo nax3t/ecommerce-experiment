@@ -1,5 +1,17 @@
 <% layout("layouts/boilerplate") -%>
 
+<!--Flash messages-->
+<% if(error && error.length > 0){ %>
+<div id="flash" class="alert alert-danger col-md-6 col-md-offset-3" role="alert">
+    <%= error %>
+</div>
+<% } %>
+<% if(success && success.length > 0){ %>
+<div id="flash" class="alert alert-success col-md-6 col-md-offset-3" role="alert">
+    <%= success %>
+</div>
+<% } %>
+
 <% if (products != null) { %>
 
 <div class="row">

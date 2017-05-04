@@ -5,6 +5,8 @@ var stripe = require("stripe")(process.env.SECRET_KEY);
 
 var Cart = require("../models/cart");
 var Product = require("../models/product");
+var Order = require("../models/order");
+var middleware = require("../middleware");
 
 // get home page
 router.get("/", function (req, res) {
@@ -37,7 +39,7 @@ router.get("/add-to-cart/:id", function (req, res) {
 // get the shopping cart view
 router.get("/shopping-cart", function (req, res) {
     // if the cart in the session is empty, pass products to view as null
-    if  (!req.session.cart) {
+    if (!req.session.cart) {
         return res.render("products/shopping-cart", {products: null, totalPrice: null});
     }
     // else pass the existing cart
@@ -46,17 +48,18 @@ router.get("/shopping-cart", function (req, res) {
 });
 
 // get the cart checkout route
-router.get("/checkout", function (req, res, next) {
-    if  (!req.session.cart) {
+router.get("/checkout", middleware.isLoggedIn, function (req, res, next) {
+    if (!req.session.cart) {
+        req.flash("error", "Your cart is empty!");
         return res.redirect("/shopping-cart");
     }
     var cart = new Cart(req.session.cart);
     res.render("products/checkout", {keyPublishable: keyPublishable, total: cart.totalPrice});
 });
 
-// post route checkout
-router.post("/checkout", function (req, res) {
-    if  (!req.session.cart) {
+// post route checkout - CHARGE
+router.post("/checkout", middleware.isLoggedIn, function (req, res) {
+    if (!req.session.cart) {
         return res.redirect("/shopping-cart");
     }
     var cart = new Cart(req.session.cart);
@@ -65,16 +68,33 @@ router.post("/checkout", function (req, res) {
         currency: "usd",
         source: req.body.stripeToken, // obtained with Stripe.js
         description: "Test Tour Charge"
-    }, function(err, charge) {
+    }, function (err, charge) {
         // if something went wrong with the purchase
         if (err) {
             req.flash("error", err.message);
             return res.redirect("/checkout");
         }
         // if the purchase is successful
-        req.flash("success", "You successfully paid $" + cart.totalPrice + "!");
-        req.session.cart = null;
-        res.redirect("/products");
+
+        // creating new order and saving it to the database
+        var order = new Order({
+            user: req.user,
+            cart: cart,
+            address: req.body.address,
+            name: req.body.name,
+            email: req.user.email,
+            paymentId: charge.id
+        });
+        order.save(function (err, result) {
+            if (err) {
+                console.log(err);
+                req.flash("error", "Something went wrong with saving your order.");
+                return res.redirect("/products");
+            }
+            req.flash("success", "You successfully paid $" + cart.totalPrice + "!");
+            req.session.cart = null;
+            res.redirect("/products");
+        });
     });
 });
 
