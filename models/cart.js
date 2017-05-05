@@ -23,7 +23,26 @@ module.exports = function Cart(oldCart) {       // add old cart into new cart
         storedItem.price = storedItem.item.basePrice * storedItem.qty;
         this.totalQty++;
         this.totalPrice += storedItem.item.basePrice;
-        };
+    };
+
+    // reduce by one unit
+    this.reduceByOne = function (id) {
+        this.items[id].qty--;
+        this.items[id].price -= this.items[id].item.price;
+        this.totalQty--;
+        this.totalPrice -= this.items[id].item.price;
+
+        if (this.items[id].qty <= 0) {
+            delete this.items[id];
+        }
+    };
+
+    // remove item
+    this.removeItem = function (id) {
+        this.totalQty -= this.items[id].qty;
+        this.totalPrice -= this.items[id].price;
+        delete this.items[id];
+    };
 
     // transform it into an array for lists etc.
     this.generateArray = function () {

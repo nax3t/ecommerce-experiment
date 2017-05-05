@@ -36,6 +36,26 @@ router.get("/add-to-cart/:id", function (req, res) {
     });
 });
 
+// remove one unit from cart
+router.get("/reduce/:id", function (req, res) {
+    var productId = req.params.id;
+    var cart = new Cart(req.session.cart ? req.session.cart : {});
+
+    cart.reduceByOne(productId);
+    req.session.cart = cart;
+    res.redirect("/shopping-cart");
+});
+
+// remove all units from cart
+router.get("/remove/:id", function (req, res) {
+    var productId = req.params.id;
+    var cart = new Cart(req.session.cart ? req.session.cart : {});
+
+    cart.removeItem(productId);
+    req.session.cart = cart;
+    res.redirect("/shopping-cart");
+});
+
 // get the shopping cart view
 router.get("/shopping-cart", function (req, res) {
     // if the cart in the session is empty, pass products to view as null
