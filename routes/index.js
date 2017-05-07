@@ -30,7 +30,14 @@ router.get("/add-to-cart/:id", function (req, res) {
         cart.add(product, product.id);
         // store cart object in session
         req.session.cart = cart;
-        console.log(req.session.cart);
+
+        // Z-REMOVING FROM PRODUCT STOCK AFTER ADDING TO CART
+        console.log("ADD TO CART - Stock went from: " + product.stock);
+        product.stock--;
+        product.save();
+        console.log("ADD TO CART - Stock went to: " + product.stock);
+
+        // console.log(req.session.cart);
         res.redirect("/");
         // FLASH MSGS...
     });
@@ -41,9 +48,23 @@ router.get("/reduce/:id", function (req, res) {
     var productId = req.params.id;
     var cart = new Cart(req.session.cart ? req.session.cart : {});
 
-    cart.reduceByOne(productId);
-    req.session.cart = cart;
-    res.redirect("/shopping-cart");
+    Product.findById(productId, function (err, product) {
+        if (err) {
+            console.log(err);
+            return res.redirect("/");
+        }
+
+        cart.reduceByOne(productId);
+        req.session.cart = cart;
+
+        console.log("REMOVE 1 FROM CART - Stock went from: " + product.stock);
+        product.stock++;
+        product.save();
+        console.log("REMOVE 1 FROM CART - Stock went to: " + product.stock);
+
+        res.redirect("/shopping-cart");
+
+    });
 });
 
 // remove all units from cart
@@ -51,9 +72,26 @@ router.get("/remove/:id", function (req, res) {
     var productId = req.params.id;
     var cart = new Cart(req.session.cart ? req.session.cart : {});
 
-    cart.removeItem(productId);
-    req.session.cart = cart;
-    res.redirect("/shopping-cart");
+    Product.findById(productId, function (err, product) {
+        if (err) {
+            console.log(err);
+            return res.redirect("/");
+        }
+
+        var removedQty = cart.items[productId].qty;
+        console.log("REMOVE ALL FROM CHAT - Stock to return: " + removedQty);
+
+        cart.removeItem(productId);
+        req.session.cart = cart;
+
+        console.log("REMOVE ALL FROM CART - Stock went from: " + product.stock);
+        product.stock += removedQty;
+        product.save();
+        console.log("REMOVE ALL FROM CART - Stock went to: " + product.stock);
+
+        res.redirect("/shopping-cart");
+
+    });
 });
 
 // get the shopping cart view

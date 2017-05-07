@@ -28,9 +28,9 @@ module.exports = function Cart(oldCart) {       // add old cart into new cart
     // reduce by one unit
     this.reduceByOne = function (id) {
         this.items[id].qty--;
-        this.items[id].price -= this.items[id].item.price;
+        this.items[id].price -= this.items[id].item.basePrice;
         this.totalQty--;
-        this.totalPrice -= this.items[id].item.price;
+        this.totalPrice -= this.items[id].item.basePrice;
 
         if (this.items[id].qty <= 0) {
             delete this.items[id];
