@@ -16,6 +16,7 @@ const validator = require("express-validator");
 const MongoStore = require("connect-mongo")(session);
 
 const productRoutes = require("./routes/products");
+const categoryRoutes = require("./routes/category");
 const indexRoutes = require("./routes/index");
 const userRoutes = require("./routes/user");
 
@@ -69,6 +70,7 @@ app.use(function(req, res, next) {
 app.use(indexRoutes);
 app.use("/user", userRoutes);
 app.use("/products", productRoutes);
+app.use("/categories", categoryRoutes);
 
 app.listen(3000, () => {
 	console.log('Server running, listening on port 3000');

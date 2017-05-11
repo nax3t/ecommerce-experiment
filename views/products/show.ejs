@@ -1,5 +1,20 @@
 <% layout('layouts/boilerplate') -%>
 
+<h4>Category:</h4>
+<%= product.category %>
+
+<h4>Image:</h4>
+<img src="<%= product.imagePath %>" alt="<%= product.title %>">
+
+<h4>Title:</h4>
+<%= product.title %>
+
+<h4>Description:</h4>
+<%= product.description %>
+
+<h4>Base price:</h4>
+<%= product.basePrice %>
+
 <h4>Date:</h4>
 <%= product.formattedDate %>
 
@@ -10,6 +25,10 @@
 <%= product.stock %>
 
 <form action="/products/<%= product._id %>/charge" id="alcatraz-purchase-form" method="POST">
+
+
+
+
 	<div>
 		<label for="bundled-product">Choose product to bundle with:</label>
 		<select name="bundled-product" id="bundled-product">

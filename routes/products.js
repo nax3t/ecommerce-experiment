@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+var Category = require("../models/category");
 const Product = require("../models/product");
 const moment = require("moment");
 const stripe = require("stripe")(process.env.SECRET_KEY);
@@ -55,42 +56,72 @@ router.get("/", function (req, res) {
         if (err) {
             console.log(err);
         } else {
-            var productChunks = [];
-            var chunkSize = 4;  // number of products per row
-            for (var i = 0; i < allProducts.length; i += chunkSize) {
-                productChunks.push(allProducts.slice(i, i + chunkSize));
-            }
-            res.render("products/index", {products: productChunks});
+
+            res.render("products/index", {products: allProducts});
         }
     });
 });
 
 //CREATE - add new product to DB
 router.post("/", function (req, res) {
-    var formattedDate = moment(req.body.date).format('MMMM Do YYYY');
-    var date = new Date(req.body.date);
-    var newProduct = {formattedDate: formattedDate, date: date, time: req.body.time, stock: req.body.stock};
-    // Create a new product and save to DB
-    Product.create(newProduct, function (err, newlyCreated) {
+
+    console.log("req.body.selectcategory: " + req.body.selectcategory);
+    var category = req.body.selectcategory;
+
+    Category.findById(category._id, function (err, foundCategory) {
         if (err) {
             console.log(err);
+            req.flash("error", "Error finding category");
+            res.redirect("/");
         } else {
-            //redirect back to products page
-            console.log(newlyCreated);
-            res.redirect(`/products/${newlyCreated.id}`);
+
+            var formattedDate = moment(req.body.date).format('MMMM Do YYYY');
+            var date = new Date(req.body.date);
+
+            var newProduct = {
+                title: req.body.title,
+                imagePath: req.body.imagePath,
+                description: req.body.description,
+                basePrice: req.body.basePrice,
+                formattedDate: formattedDate,
+                date: date,
+                time: req.body.time,
+                stock: req.body.stock
+            };
+
+            Product.create(newProduct, function (err, newlyCreated) {
+                if (err) {
+                    console.log(err);
+                    req.flash("error", "Error creating product");
+                } else {
+                    // foundCategory.products.push(newlyCreated);
+                    // foundCategory.save();
+                    //redirect back to products page
+                    console.log("NEWLY CREATED PRODUCT " + newlyCreated);
+                    res.redirect(`/products/${newlyCreated.id}`);
+                }
+            });
         }
     });
 });
 
 //NEW - show form to create new product
 router.get("/new", function (req, res) {
-    res.render("products/new");
+    Category.find({}, function (err, allCategories) {
+        if (err) {
+            console.log(err);
+        } else {
+            // Find all categories, loop in new.ejs, select menu, save object id in  req body and use it to
+            res.render("products/new", {categories: allCategories});
+        }
+    });
 });
 
 // SHOW - shows more info about one product
 router.get("/:id", function (req, res) {
+
     //find the product with provided ID
-    Product.findById(req.params.id, function (err, foundProduct) {
+    Product.findById(req.params.id).populate("category").exec(function (err, foundProduct) {
         if (err) {
             console.log(err);
         } else {
@@ -102,41 +133,58 @@ router.get("/:id", function (req, res) {
 });
 
 router.get("/:id/edit", function (req, res) {
-    //find the product with provided ID
-    Product.findById(req.params.id, function (err, foundProduct) {
+    Category.find({}, function (err, allCategories) {
         if (err) {
             console.log(err);
         } else {
-            //render show template with that product
-            res.render("products/edit", {product: foundProduct});
+            //find the product with provided ID
+            Product.findById(req.params.id, function (err, foundProduct) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    //render show template with that product and all categories
+                    res.render("products/edit", {product: foundProduct, categories: allCategories});
+                }
+            });
         }
     });
 });
 
 router.put("/:id", function (req, res) {
-    eval(require('locus'));
-    var formattedDate = moment(req.body.date).format('MMMM Do YYYY');
-    var date = new Date(req.body.date);
-    var newProductData = {formattedDate: formattedDate, date: date, time: req.body.time, stock: req.body.stock};
-    Product.findByIdAndUpdate(req.params.id, newProductData, {new: true}, function (err, updatedProduct) {
+
+    var category = req.body.selectcategory;
+
+    Category.findById(category._id, function (err, foundCategory) {
         if (err) {
             console.log(err);
-            res.redirect("back");
+            req.flash("error", "Error finding category");
+            res.redirect("/");
         } else {
-            res.redirect(`/products/${updatedProduct.id}`);
+
+            var formattedDate = moment(req.body.date).format('MMMM Do YYYY');
+            var date = new Date(req.body.date);
+
+            var newProductData = {
+                title: req.body.title,
+                imagePath: req.body.imagePath,
+                description: req.body.description,
+                basePrice: req.body.basePrice,
+                formattedDate: formattedDate,
+                date: date,
+                time: req.body.time,
+                stock: req.body.stock
+            };
+            Product.findByIdAndUpdate(req.params.id, newProductData, {new: true}, function (err, updatedProduct) {
+                if (err) {
+                    console.log(err);
+                    res.redirect("back");
+                } else {
+                    res.redirect(`/products/${updatedProduct.id}`);
+                }
+            });
         }
     });
 });
-
-
-//middleware
-// function isLoggedIn(req, res, next){
-//     if(req.isAuthenticated()){
-//         return next();
-//     }
-//     req.flash("error", "You must be signed in to do that!");
-//     res.redirect("/login");
-// }
 
 module.exports = router;
 

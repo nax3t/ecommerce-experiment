@@ -1,0 +1,32 @@
+<% layout("layouts/boilerplate") -%>
+
+<!--Flash messages-->
+<% if(error && error.length > 0){ %>
+<div id="flash" class="alert alert-danger" role="alert">
+    <%= error %>
+</div>
+<% } %>
+<% if(success && success.length > 0){ %>
+<div id="flash" class="alert alert-success" role="alert">
+    <%= success %>
+</div>
+<% } %>
+
+
+<div class="row">
+    <% categories.forEach(function(category) { %>
+    <div class="col-sm-6 col-md-3">
+        <div class="thumbnail">
+            <a href="/products/<%= category.id %>">
+                <img class="img-responsive" src="<%= category.imagePath %>" alt="<%= category.title %>"></a>
+            <div class="caption">
+                <h4><%= category.title %></h4>
+
+                <div class="clearfix">
+                    <a href="/categories/<%= category.id %>" class="btn btn-primary pull-right" role="button">View Offers</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <% }); %>
+</div>

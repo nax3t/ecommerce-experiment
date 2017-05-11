@@ -12,15 +12,14 @@
 </div>
 <% } %>
 
-<% products.forEach(function(productChunk) { %>
-<div class="row">
-    <% productChunk.forEach(function(product) { %>
+
+<% products.forEach(function(product) { %>
     <div class="col-sm-6 col-md-3">
         <div class="thumbnail">
             <a href="/products/<%= product.id %>">
-                <img class="img-responsive" src="<%= product.imagePath %>" alt="Alcatraz"></a>
+                <img class="img-responsive" src="<%= product.imagePath %>" alt="<%= product.title %>"></a>
             <div class="caption">
-                <h4>Tour of Alcatraz</h4>
+                <h4><%= product.title %></h4>
                 <p class="description"><%= product.formattedDate %></p>
                 <div class="clearfix">
                     <div class="price pull-left">from $<%= product.basePrice %></div>
@@ -32,4 +31,3 @@
     </div>
     <% }); %>
 </div>
-<% }); %>

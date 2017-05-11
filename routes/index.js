@@ -4,13 +4,20 @@ var keyPublishable = process.env.PUBLISHABLE_KEY;
 var stripe = require("stripe")(process.env.SECRET_KEY);
 
 var Cart = require("../models/cart");
+var Category = require("../models/category");
 var Product = require("../models/product");
 var Order = require("../models/order");
 var middleware = require("../middleware");
 
-// get home page
+// get home page (CATEGORIES INDEX PAGE)
 router.get("/", function (req, res) {
-    res.redirect("/products");
+    Category.find({}, function (err, allCategories) {
+        if (err) {
+            console.log(err);
+        } else {
+            res.render("landing", {categories: allCategories});
+        }
+    });
 });
 
 // add to cart
@@ -37,9 +44,26 @@ router.get("/add-to-cart/:id", function (req, res) {
         product.save();
         console.log("ADD TO CART - Stock went to: " + product.stock);
 
+        // Timer to remove item
+        console.log("Starting timer: 2 secs");
+        console.log(cart);
+
+        setTimeout(function () {
+            cart.removeItem(productId);
+            console.log("item removed");
+            req.session.cart = cart;
+            console.log(cart);
+            console.log(req.session.cart.totalQty);
+            console.log(req.session.cart.totalQty);
+            console.log(req.session.cart.totalQty);
+            console.log(req.session.cart);
+        }, 2000);
+
+        console.log(req.session.cart.totalQty);
+
         // console.log(req.session.cart);
-        res.redirect("/");
-        // FLASH MSGS...
+        req.flash("success", "Successfully added to cart!");
+        res.redirect("/products");
     });
 });
 
@@ -89,6 +113,7 @@ router.get("/remove/:id", function (req, res) {
         product.save();
         console.log("REMOVE ALL FROM CART - Stock went to: " + product.stock);
 
+        req.flash("success", "Successfully removed all units of the product from the cart!");
         res.redirect("/shopping-cart");
 
     });
