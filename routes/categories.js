@@ -42,7 +42,6 @@ router.get("/new", function (req, res) {
 
 // SHOW - show category page with it's products
 router.get("/:id", function (req, res) {
-
     Category.findById(req.params.id).populate("products").exec(function (err, foundCategory) {
         if (err) {
             console.log(err);

@@ -16,16 +16,16 @@ const validator = require("express-validator");
 const MongoStore = require("connect-mongo")(session);
 
 const productRoutes = require("./routes/products");
-const categoryRoutes = require("./routes/category");
+const categoryRoutes = require("./routes/categories");
 const indexRoutes = require("./routes/index");
 const userRoutes = require("./routes/user");
 
 
 
 mongoose.Promise = global.Promise;
-mongoose.connect(process.env.DATABASEURL);
+// mongoose.connect(process.env.DATABASEURL);
 require("./config/passport");
-// mongoose.connect("mongodb://localhost/node-ecommerce-test");
+mongoose.connect("mongodb://localhost/node-ecommerce-test");
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.json());

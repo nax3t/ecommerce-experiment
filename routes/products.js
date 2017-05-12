@@ -64,11 +64,8 @@ router.get("/", function (req, res) {
 
 //CREATE - add new product to DB
 router.post("/", function (req, res) {
-
-    console.log("req.body.selectcategory: " + req.body.selectcategory);
     var category = req.body.selectcategory;
-
-    Category.findById(category._id, function (err, foundCategory) {
+    Category.findById(category, function (err, foundCategory) {
         if (err) {
             console.log(err);
             req.flash("error", "Error finding category");
@@ -94,8 +91,8 @@ router.post("/", function (req, res) {
                     console.log(err);
                     req.flash("error", "Error creating product");
                 } else {
-                    // foundCategory.products.push(newlyCreated);
-                    // foundCategory.save();
+                    foundCategory.products.push(newlyCreated);
+                    foundCategory.save();
                     //redirect back to products page
                     console.log("NEWLY CREATED PRODUCT " + newlyCreated);
                     res.redirect(`/products/${newlyCreated.id}`);

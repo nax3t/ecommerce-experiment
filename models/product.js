@@ -9,12 +9,7 @@ var productSchema = new mongoose.Schema({
     date: {type: Date, required: true},
     time: {type: String, required: true},
     stock: {type: Number, required: true},
-    category: [
-     {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Category"
-    }
-    ]
+    category: String
 });
 
 module.exports = mongoose.model("Product", productSchema);
